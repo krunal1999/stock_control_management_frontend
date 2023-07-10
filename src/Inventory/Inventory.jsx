@@ -3,19 +3,17 @@ import Navbar from "../componets/Navbar";
 import Sidebar from "../componets/Sidebar";
 import Grid from "@mui/material/Unstable_Grid2";
 import AddIcon from "@mui/icons-material/Add";
-import "../pagescss/inventory.css"
-import InventoryList from "../subpages/InventoryList";
-
+import "../pagescss/inventory.css";
+import InventoryList from "./InventoryList";
+import { useNavigate } from "react-router-dom";
 
 const Inventory = () => {
+  const nav = useNavigate();
 
   function handleClick(e) {
     e.stopPropagation();
-    
-
-    
+    nav("/inventory/new");
   }
-
 
   return (
     <>
@@ -29,11 +27,14 @@ const Inventory = () => {
             {/* div with add new button */}
             <Grid item xs={12}>
               <Paper varient="outlined" elevation={0}>
-                <div className="addnewitem" >
-                  <Button variant="contained" startIcon={<AddIcon />}
-                  onClick={handleClick}
+                
+                <div className="addnewitem">
+                  <Button
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={handleClick}
                   >
-                    Add
+                    Add Item
                   </Button>
                 </div>
               </Paper>
@@ -42,15 +43,9 @@ const Inventory = () => {
             {/* div with list */}
 
             <Grid item xs={12}>
-              
               <Paper varient="outlined" elevation={2}>
                 <InventoryList />
-
-
               </Paper>
-
-          
-              
             </Grid>
           </Grid>
         </Box>

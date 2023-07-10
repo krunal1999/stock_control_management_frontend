@@ -72,6 +72,7 @@ export default function Sidebar() {
         <Divider />
 
         <List sx={{ color: "#191970" }}>
+
           <SidebarList
             arList
             open={open}
@@ -79,6 +80,7 @@ export default function Sidebar() {
             iconName={<HomeIcon />}
             linkName={"/home"}
           />
+          <Divider />
 
           <SidebarList
             open={open}

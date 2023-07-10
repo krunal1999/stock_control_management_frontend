@@ -1,10 +1,10 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Home from "./componets/Home";
-import Inventory from "./pages/Inventory";
+import Inventory from "./Inventory/Inventory";
 import Sales from "./pages/Sales";
 import Purchase from "./pages/Purchase";
-import InventoryAddItems from "./subpages/InventoryAddItems";
+import InventoryAddItems from "./Inventory/InventoryAddItems";
 
 function App() {
   return (
