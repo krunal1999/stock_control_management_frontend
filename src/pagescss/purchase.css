@@ -1,0 +1,41 @@
+.purchaseitembox{
+        display: flex;
+        gap: 20px;
+        width: 40%;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+}
+.purchaseitemformtext{
+        font-size: 20px;
+        font-weight: 400;
+
+
+}
+
+.boxfortable{
+        width: 90%;
+        margin-bottom: 24px;
+        
+
+}
+
+.mailbox{
+        display: flex;
+        gap: 20px;
+        width: 40%;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        font-size: 20px;
+        font-weight: 400;
+        padding-left: 40px;
+        
+}
+.mailboxeditor{
+        width: 60%;
+        padding-left: 40px;
+        height: 600px;
+        overflow-x: scroll;
+        margin-bottom: 24px;
+}

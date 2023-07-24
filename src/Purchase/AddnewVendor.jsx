@@ -1,15 +1,15 @@
 import { Button, Divider, Paper, Stack, Typography } from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useNavigate } from "react-router-dom";
-import InventoryAddItemForm from "./InventoryAddItemForm";
+import AddnewVendorform from "./AddnewVendorform";
 import AdminLayout from "../layouts/AdminLayout";
 
-const InventoryAddItems = () => {
+const AddnewVendor = () => {
   const nav = useNavigate();
 
   function handleClick(e) {
     e.stopPropagation();
-    nav("/inventory");
+    nav("/purchase/vendor");
   }
   return (
     <>
@@ -21,7 +21,7 @@ const InventoryAddItems = () => {
             justifyContent="space-between"
             alignContent="center"
           >
-            <Typography variant="h5">Add New Item</Typography>
+            <Typography variant="h5">Add New Vendor</Typography>
             <Button
               variant="contained"
               startIcon={<CancelIcon />}
@@ -37,11 +37,11 @@ const InventoryAddItems = () => {
 
         {/* add new item form  */}
         <Paper elevation={10} sx={{ padding: 3, marginTop: 3 }}>
-          <InventoryAddItemForm />
+          <AddnewVendorform />
         </Paper>
       </AdminLayout>
     </>
   );
 };
 
-export default InventoryAddItems;
+export default AddnewVendor;

@@ -1,17 +1,15 @@
-import { Button, Paper } from "@mui/material";
-import Grid from "@mui/material/Unstable_Grid2";
+import { Button, Grid, Paper } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import "../pagescss/inventory.css";
-import InventoryList from "./InventoryList";
 import { useNavigate } from "react-router-dom";
+import PurchaseList from "./PurchaseList";
 import AdminLayout from "../layouts/AdminLayout";
 
-const Inventory = () => {
+const Purchase = () => {
   const nav = useNavigate();
 
   function handleClick(e) {
     e.stopPropagation();
-    nav("/inventory/new");
+    nav("/purchase/purchaseorder");
   }
 
   return (
@@ -27,7 +25,7 @@ const Inventory = () => {
                   startIcon={<AddIcon />}
                   onClick={handleClick}
                 >
-                  Add Item
+                  Make Purchase
                 </Button>
               </div>
             </Paper>
@@ -37,7 +35,7 @@ const Inventory = () => {
 
           <Grid item xs={12}>
             <Paper varient="outlined" elevation={2}>
-              <InventoryList />
+              <PurchaseList filter={true} />
             </Paper>
           </Grid>
         </Grid>
@@ -46,4 +44,4 @@ const Inventory = () => {
   );
 };
 
-export default Inventory;
+export default Purchase;

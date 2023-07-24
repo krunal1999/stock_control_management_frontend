@@ -1,21 +1,17 @@
-import { Box, Typography } from "@mui/material";
-import Sidebar from "./Sidebar";
-import Navbar from "./Navbar";
+import { useEffect } from "react";
+import AdminLayout from "../layouts/AdminLayout";
+import { toast } from "react-toastify";
 
 const Home = () => {
+  useEffect(()=>{
+    toast.info("home");
+  },[])
   return (
     <>
-      <Navbar />
-
-      <Box sx={{ display: "flex", flexGrow: 1 }}>
-        <Sidebar />
-
-        <Box component="main" sx={{ flexGrow: 1, padding: 3, marginTop: 8 }}>
-          <Typography>
-            
-          </Typography>
-        </Box>
-      </Box>
+     <AdminLayout>
+      <div>homee</div>
+     
+     </AdminLayout>
     </>
   );
 };

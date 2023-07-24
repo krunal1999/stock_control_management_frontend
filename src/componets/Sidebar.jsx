@@ -2,15 +2,23 @@ import * as React from "react";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
-import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
 
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import SidebarList from "./SidebarList";
+import { useState } from "react";
+import MenuIcon from "@mui/icons-material/Menu";
+import Typography from "@mui/material/Typography";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import InventorySidebar from "../Inventory/InventorySidebar";
+import PurchaseSidebar from "../Purchase/PurchaseSidebar";
 
-import HomeIcon from "@mui/icons-material/Home";
+import { ListItemButton, ListItemIcon } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import DashboardCustomizeTwoToneIcon from "@mui/icons-material/DashboardCustomizeTwoTone";
+import StoreTwoToneIcon from "@mui/icons-material/StoreTwoTone";
+import MonetizationOnTwoToneIcon from "@mui/icons-material/MonetizationOnTwoTone";
 
 const drawerWidth = 240;
 
@@ -62,47 +70,96 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 export default function Sidebar() {
-  const open = true;
+  const [open, setOpen] = useState(true);
+
+  function handleDrawer(params) {
+    setOpen(!open);
+  }
 
   return (
     <Box sx={{ display: "flex" }}>
       <Drawer variant="permanent" open={open}>
         <DrawerHeader />
+        <DrawerHeader>
+          <ListItemButton onClick={handleDrawer}>
+            <ListItemIcon>
+              <MenuIcon />
+            </ListItemIcon>
+          </ListItemButton>
+        </DrawerHeader>
 
         <Divider />
 
-        <List sx={{ color: "#191970" }}>
+        <div>
+          <Accordion onClick={() => setOpen(true)}>
+            <AccordionSummary
+              expandIcon={open ? <ExpandMoreIcon /> : ""}
+              aria-controls="panel1a-content"
+              id="panel1a-header"
+            >
+              <Typography>
+                {open ? "Home" : <DashboardCustomizeTwoToneIcon />}
+              </Typography>
+            </AccordionSummary>
+            {open ? <AccordionDetails></AccordionDetails> : ""}
+          </Accordion>
 
-          <SidebarList
-            arList
-            open={open}
-            name={"Home"}
-            iconName={<HomeIcon />}
-            linkName={"/home"}
-          />
-          <Divider />
+          <Accordion onClick={() => setOpen(true)}>
+            <AccordionSummary
+              expandIcon={open ? <ExpandMoreIcon /> : ""}
+              aria-controls="panel2a-content"
+              id="panel2a-header"
+            >
+              <Typography>{open ? "Inventory" : <InventoryIcon />}</Typography>
+            </AccordionSummary>
+            {open ? (
+              <AccordionDetails>
+                <InventorySidebar />
+              </AccordionDetails>
+            ) : (
+              ""
+            )}
+          </Accordion>
 
-          <SidebarList
-            open={open}
-            name={"Inventory"}
-            iconName={<InventoryIcon />}
-            linkName={"/inventory"}
-          />
+          <Accordion onClick={() => setOpen(true)}>
+            <AccordionSummary
+              expandIcon={open ? <ExpandMoreIcon /> : ""}
+              aria-controls="panel2a-content"
+              id="panel2a-header"
+            >
+              <Typography>
+                {open ? "Purchase" : <StoreTwoToneIcon />}
+              </Typography>
+            </AccordionSummary>
 
-          <SidebarList
-            open={open}
-            name={"Sales"}
-            iconName={<MonetizationOnIcon />}
-            linkName={"/sales"}
-          />
+            {open ? (
+              <AccordionDetails>
+                <PurchaseSidebar />
+              </AccordionDetails>
+            ) : (
+              ""
+            )}
+          </Accordion>
 
-          <SidebarList
-            open={open}
-            name={"Purchases"}
-            iconName={<InboxIcon />}
-            linkName={"/purchase"}
-          />
-        </List>
+          <Accordion onClick={() => setOpen(true)}>
+            <AccordionSummary
+              expandIcon={open ? <ExpandMoreIcon /> : ""}
+              aria-controls="panel2a-content"
+              id="panel2a-header"
+            >
+              <Typography>
+                {open ? "Sales" : <MonetizationOnTwoToneIcon />}
+              </Typography>
+            </AccordionSummary>
+            {open ? (
+              <AccordionDetails>
+                <Typography></Typography>
+              </AccordionDetails>
+            ) : (
+              ""
+            )}
+          </Accordion>
+        </div>
 
         <Divider />
       </Drawer>
