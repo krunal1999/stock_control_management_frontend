@@ -13,14 +13,23 @@ const columns = [
   { field: "quantity", headerName: "Quantity", width: 130 },
 
   { field: "total", headerName: "Total", width: 200 },
-  { field: "orderstatus", headerName: "OrderStatus", width: 130 },
-  { field: "billstatus", headerName: "Bill Status", width: 130 },
+  {
+    field: "orderstatus",
+    headerName: "OrderStatus",
+    width: 130,
+    renderCell: (param) => {
+      return (
+        <div className={`cellWithstatus ${param.row.orderstatus}`}>
+          {param.row.orderstatus}
+        </div>
+      );
+    },
+  },
+ 
   { field: "expectdate", headerName: "Expected Date", width: 130 },
 ];
 
-const PurchaseListCopy = ({ rows}) => {
-
-
+const PurchaseListCopy = ({ rows }) => {
   return (
     <div style={{ height: "600px", width: "100%", overflowX: "scroll" }}>
       <DataGrid

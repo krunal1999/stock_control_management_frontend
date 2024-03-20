@@ -1,15 +1,40 @@
 import axios from "axios";
+import { getToken } from "../../authrntication/UserService";
 
-const RECEIEVE_BASE_URL ="http://localhost:8080/receieve";
+export const RECEIEVE_BASE_URL = "http://localhost:8080/admin/receieve";
 
-class ReceieveOrderService{
-        
-        getList(){
-                return axios.get(RECEIEVE_BASE_URL + "/getlist")
-        }
+export const publicAxios = axios.create({
+  baseURL: RECEIEVE_BASE_URL,
+});
 
+export const privateAxios = axios.create({
+  baseURL: RECEIEVE_BASE_URL,
+});
 
+privateAxios.interceptors.request.use(
+  (config) => {
+        const token = getToken();
+    
+        console.log(token);
+    if (token) {
 
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+class ReceieveOrderService {
+  getList() {
+    return privateAxios.get(RECEIEVE_BASE_URL + "/getlist");
+  }
+  updateUsedStatus(roid) {
+    return privateAxios.post(RECEIEVE_BASE_URL + "/changethestatus/"+roid);
+  }
 }
 // eslint-disable-next-line
 export default new ReceieveOrderService();

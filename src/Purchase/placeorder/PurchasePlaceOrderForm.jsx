@@ -12,6 +12,7 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Typography,
 } from "@mui/material";
 import "../../pagescss/purchase.css";
 import { useNavigate } from "react-router-dom";
@@ -26,6 +27,16 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers";
 
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+import timezone from "dayjs/plugin/timezone";
+import InventoryService from "../../Inventory/InventoryService";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault("Europe/London");
+
 const PurchasePlaceOrderForm = () => {
   const vendorDisplayName = [];
   const [inputValue, setInputValue] = useState("");
@@ -37,10 +48,15 @@ const PurchasePlaceOrderForm = () => {
   const [tax, setTax] = useState(0);
   const [taxamount, setTaxAmount] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
+
+  const [Orderingcost, setorderingcost] = useState(0);
+  const [Annualdemandquantity, setAnnualdemandquantity] = useState(1);
+  const [unitCost, setunitCost] = useState(1);
+  const [EoqQuantity, setEoqQuantity] = useState(1);
   const [currdate, setCurrDate] = useState("");
   const [expectdate, setexpectDate] = useState("");
-
   const [vendorlist, setVendorlist] = useState([]);
+
 
   const [purchaseOrder, setPurchaseOrder] = useState({
     vendoruniquename: "",
@@ -55,22 +71,27 @@ const PurchasePlaceOrderForm = () => {
     tax: "",
     taxamount: "",
     total: "",
+    productStatus: "",
+    orderstatus:"NOT ORDERED"
   });
 
-  const onReset =()=>{
-   
-  }
+  const onReset = () => {};
 
   const nav = useNavigate();
 
   const Categoriesrows = [];
   const [CategoriesList, setCategoriesList] = useState([]);
+  const [UniqueProductList, setUniqueProductList] = useState([]);
 
   useEffect(() => {
     const fetchdata = async () => {
       try {
         const res = await CategoriesService.getCategoriesList();
         setCategoriesList(res.data);
+
+        const uniqueproduct = await InventoryService.getuniqueproduct();
+
+        setUniqueProductList(uniqueproduct.data);
       } catch (error) {
         console.log(error);
       }
@@ -80,8 +101,16 @@ const PurchasePlaceOrderForm = () => {
   }, []);
 
   CategoriesList.forEach((pl) => {
-    Categoriesrows.unshift(pl.type);
+    if (pl.activestatus === "ACTIVE") {
+      Categoriesrows.unshift(pl.type);
+    }
   });
+
+  const temp = [];
+  UniqueProductList.forEach((value) => {
+    temp.push(value.uniqueproductname);
+  });
+  const uniqueproductDisplayList = [...new Set(temp)];
 
   useEffect(() => {
     const fetchVendor = async () => {
@@ -97,17 +126,24 @@ const PurchasePlaceOrderForm = () => {
   }, []);
 
   vendorlist.forEach((v) => {
-    vendorDisplayName.push(v.vendoruniquename);
+    if (v.activestatus === "ACTIVE") {
+      vendorDisplayName.push(v.vendoruniquename);
+    }
   });
 
   function handleChange(e) {
     const { name, value } = e.target;
     if (name === "buyprice") {
       setprice(value);
+      setunitCost(0.25)
     } else if (name === "quantity") {
       setquantity(value);
     } else if (name === "tax") {
       setTax(value);
+    } else if (name === "annualdemandquantity") {
+      setAnnualdemandquantity(value);
+    } else if (name === "orderingcost") {
+      setorderingcost(value);
     }
 
     setPurchaseOrder({
@@ -125,6 +161,15 @@ const PurchasePlaceOrderForm = () => {
     const newTotalAmount = amount + newTax;
     setTotalAmount(newTotalAmount);
 
+
+    let sku = Annualdemandquantity * price;
+
+    let eoq = Math.sqrt((2 * sku * Orderingcost + 1) / (price^2 * unitCost +1 ));
+
+    
+
+    setEoqQuantity(Math.round(eoq));
+
     setPurchaseOrder({
       ...purchaseOrder,
       vendoruniquename: inputValue,
@@ -135,7 +180,8 @@ const PurchasePlaceOrderForm = () => {
 
       subtotal: amount,
       taxamount: taxamount,
-      total: totalAmount
+      total: totalAmount,
+      orderstatus:"NOT ORDERED"
     });
   }, [
     price,
@@ -150,34 +196,38 @@ const PurchasePlaceOrderForm = () => {
     inputValueCate,
     taxamount,
     purchaseOrder,
+    Annualdemandquantity,
+    Orderingcost,
+    unitCost
   ]);
 
   function onSave(e) {
     e.preventDefault();
+    // let newdate = dayjs(purchaseOrder.currentdate).tz('America/New_York').format();
 
     setPurchaseOrder({
       ...purchaseOrder,
       // [e.target.name]: e.target.value,
       amount: amount,
-      currentdate: currdate,
-      expectdate: expectdate,
+      currentdate: dayjs(purchaseOrder.currentdate)
+        .tz("Europe/London")
+        .format(),
+      expectdate: dayjs(purchaseOrder.expectdate).tz("Europe/London").format(),
       taxamount: taxamount,
       total: totalAmount,
+      orderstatus:"NOT ORDERED"
     });
 
     if (purchaseOrderSchema.isValidSync(purchaseOrder)) {
-      // send to database
       PlaceOrderService.savePurchaseItem(purchaseOrder)
         .then((res) => {
           let purchaseid = res.data.purchaseid;
-          nav(`/purchase/emailsend/${purchaseid}`);
+          nav(`/admin/purchase/emailsend/${purchaseid}`);
         })
         .catch((error) => {
           console.log(error);
         });
     } else {
-      // Form is invalid, handle validation errors
-  
       toast.error("Please Fill all the fields");
       console.log(purchaseOrder);
     }
@@ -210,77 +260,147 @@ const PurchasePlaceOrderForm = () => {
       total: "",
     }}
     validationSchema={purchaseOrderSchema}
-
   ></Formik>;
 
   return (
     <>
-      <form>
-        <div className="purchaseitembox">
-          <label htmlFor="combo-box-demo" className="purchaseitemformtext">
-            Selct Vendor
-          </label>
-          <Autocomplete
-            disablePortal
-            id="combo-box-demo"
-            options={vendorDisplayName}
-            sx={{ width: 260 }}
-            inputValue={inputValue}
-            onInputChange={(event, newInputValue) => {
-              setInputValue(newInputValue);
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Vendor Name"
-                name="vendoruniquename"
+      <form style={{ width: "100%" }}>
+        <Stack
+          direction="row"
+          spacing={2}
+          sx={{ width: "100%" }}
+          divider={<Divider orientation="vertical" flexItem />}
+        >
+          <Stack sx={{ width: "45%" }}>
+            <div className="purchaseitembox" style={{ width: "80%" }}>
+              <label htmlFor="combo-box-demo" className="purchaseitemformtext">
+                Selct Vendor
+              </label>
+              <Autocomplete
+                disablePortal
+                id="combo-box-demo"
+                options={vendorDisplayName}
+                sx={{ width: 460 }}
+                inputValue={inputValue}
+                onInputChange={(event, newInputValue) => {
+                  setInputValue(newInputValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Vendor Name"
+                    name="vendoruniquename"
+                  />
+                )}
               />
-            )}
-          />
-        </div>
+            </div>
 
-        <div className="purchaseitembox">
-          <label htmlFor="combo-box-demo" className="purchaseitemformtext">
-            Date
-          </label>
+            <div className="purchaseitembox" style={{ width: "80%" }}>
+              <label htmlFor="combo-box-demo" className="purchaseitemformtext">
+                Date
+              </label>
 
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-              disablePast
-              id="outlined-"
-              variant="outlined"
-              type="date"
-              name="currentdate"
-              format="DD-MM-YYYY"
-              onChange={(newdate) => setCurrDate(newdate)}
-              // onChange={(e) => {
-              //   handleChange(e);
-              // }}
-            />
-          </LocalizationProvider>
-        </div>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  disablePast
+                  id="outlined-"
+                  variant="outlined"
+                  type="date"
+                  name="currentdate"
+                  // format="DD-MM-YYYY"
+                  onChange={(newdate) => setCurrDate(newdate.format())}
+                  // onChange={(e) => {
+                  //   handleChange(e);
+                  // }}
+                />
+              </LocalizationProvider>
+            </div>
 
-        <div className="purchaseitembox">
-          <label htmlFor="combo-box-demo" className="purchaseitemformtext">
-            Expected Date for delivery
-          </label>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-              disablePast
-              id="outlined-basic"
-              label=""
-              variant="outlined"
-              type="Date"
-              name="expectdate"
-              format="DD-MM-YYYY"
-              onChange={(newdate) => {setexpectDate(newdate)
-              console.log(newdate)}}
-              // onChange={(e) => {
-              //   handleChange(e);
-              // }}
-            />
-          </LocalizationProvider>
-        </div>
+            <div className="purchaseitembox" style={{ width: "80%" }}>
+              <label htmlFor="combo-box-demo" className="purchaseitemformtext">
+                Expected Date for delivery
+              </label>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  disablePast
+                  id="outlined-basic"
+                  label=""
+                  variant="outlined"
+                  type="Date"
+                  name="expectdate"
+                  // format="DD-MM-YYYY"
+                  onChange={(newdate) => {
+                    setexpectDate(newdate.format());
+                    console.log(newdate.format());
+                  }}
+                  // onChange={(e) => {
+                  //   handleChange(e);
+                  // }}
+                />
+              </LocalizationProvider>
+            </div>
+          </Stack>
+
+          <Stack>
+            <div className="purchaseitembox" style={{ width: "100%" }}>
+              <label htmlFor="combo-box-demo" className="purchaseitemformtext">
+                Annual Demand Quantity
+              </label>
+              <OutlinedInput
+                placeholder="Quantity"
+                type="number"
+                sx={{ width: 250 }}
+                name="annualdemandquantity"
+                onChange={(e) => {
+                  handleChange(e);
+                }}
+                endAdornment={
+                  <InputAdornment position="end">unit</InputAdornment>
+                }
+              />
+            </div>
+
+            <div className="purchaseitembox" style={{ width: "100%" }}>
+              <label htmlFor="combo-box-demo" className="purchaseitemformtext">
+                Unit Cost per year
+              </label>
+              <OutlinedInput
+                placeholder="cost"
+                
+                sx={{ width: 250 }}
+                name="unitcost"
+                value={""+unitCost + "%"}
+                startAdornment={
+                  <InputAdornment position="start"></InputAdornment>
+                }
+                readOnly
+              />
+            </div>
+
+            <div className="purchaseitembox" style={{ width: "100%" }}>
+              <label htmlFor="combo-box-demo" className="purchaseitemformtext">
+                Ordering Cost
+              </label>
+              <OutlinedInput
+                placeholder="ordering cost"
+                type="number"
+                sx={{ width: 250 }}
+                name="orderingcost"
+                onChange={(e) => {
+                  handleChange(e);
+                }}
+                startAdornment={
+                  <InputAdornment position="start">£</InputAdornment>
+                }
+              />
+            </div>
+          </Stack>
+
+          <Stack sx={{ textAlign: "center" }}>
+            <Typography variant="h5">EOQ </Typography>
+            <Typography variant="h1">{EoqQuantity}</Typography>
+          </Stack>
+        </Stack>
 
         <Divider />
         <div className="boxfortable">
@@ -306,7 +426,7 @@ const PurchasePlaceOrderForm = () => {
                     sx={{ width: 300 }}
                     disableClearable
                     name="productname"
-                    options={vendorDisplayName.map((option) => option)}
+                    options={uniqueproductDisplayList.map((option) => option)}
                     inputValue={inputValueSerchProduct}
                     onInputChange={(event, newin) => {
                       setInputValueSerchProduct(newin);
@@ -349,7 +469,9 @@ const PurchasePlaceOrderForm = () => {
                     onChange={(e) => {
                       handleChange(e);
                     }}
-                    startAdornment={<InputAdornment position="start">£</InputAdornment>}
+                    startAdornment={
+                      <InputAdornment position="start">£</InputAdornment>
+                    }
                   />
                 </TableCell>
                 <TableCell align="right">
@@ -361,7 +483,9 @@ const PurchasePlaceOrderForm = () => {
                     onChange={(e) => {
                       handleChange(e);
                     }}
-                    endAdornment={<InputAdornment position="end">unit</InputAdornment>}
+                    endAdornment={
+                      <InputAdornment position="end">unit</InputAdornment>
+                    }
                   />
                 </TableCell>
                 <TableCell align="right">
@@ -401,7 +525,9 @@ const PurchasePlaceOrderForm = () => {
                       size="small"
                       name="tax"
                       onChange={(e) => handleChange(e)}
-                      endAdornment={<InputAdornment position="end">%</InputAdornment>}
+                      endAdornment={
+                        <InputAdornment position="end">%</InputAdornment>
+                      }
                     />
                   </TableCell>
                   <TableCell align="right">

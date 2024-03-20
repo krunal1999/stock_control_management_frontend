@@ -5,6 +5,8 @@ const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 export const vendorSchema = Yup.object({
   firstname: Yup.string().min(2).max(15).required("Please Enter Firstname"),
   lastname: Yup.string().min(1).max(15).required("Please Enter lastname"),
+  brandname: Yup.string().min(1).max(15).required("Please Enter Brandname"),
+  titles: Yup.string().required("Please Enter title"),
   vendoruniquename: Yup.string()
     .min(2)
     .max(15)

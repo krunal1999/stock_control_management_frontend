@@ -7,20 +7,29 @@ import {
 import CategoryIcon from "@mui/icons-material/Category";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import InventoryIcon from "@mui/icons-material/Inventory";
+import MapIcon from "@mui/icons-material/Map";
 
 import { useNavigate } from "react-router-dom";
-
+import CrisisAlertIcon from '@mui/icons-material/CrisisAlert';
 const InventorySidebar = () => {
   const nav = useNavigate();
 
   const handleClick = () => {
-    nav("/inventory");
+    nav("/admin/inventory");
   };
   const handleaddnewitem = () => {
-    nav("/inventory/new");
+    nav("/admin/inventory/new");
   };
   const handleaddcategories = () => {
-    nav("/inventory/categories");
+    nav("/admin/inventory/categories");
+  };
+
+  const handlemap = () => {
+    nav("/admin/inventory/map");
+  };
+
+  const handleMinimumQuantity = () => {
+    nav("/admin/inventory/minimumalert");
   };
 
   return (
@@ -31,6 +40,16 @@ const InventorySidebar = () => {
             <InventoryIcon />
           </ListItemIcon>
           <ListItemText primary="Inventory" />
+        </ListItemButton>
+
+        <ListItemButton sx={{ pl: 4 }}>
+          <ListItemIcon>
+          <CrisisAlertIcon />
+          </ListItemIcon>
+          <ListItemText
+            primary="Minimum Alert"
+            onClick={handleMinimumQuantity}
+          />
         </ListItemButton>
 
         <ListItemButton sx={{ pl: 4 }}>
@@ -49,7 +68,13 @@ const InventorySidebar = () => {
             onClick={handleaddcategories}
           />
         </ListItemButton>
-        
+
+        <ListItemButton sx={{ pl: 4 }}>
+          <ListItemIcon>
+            <MapIcon />
+          </ListItemIcon>
+          <ListItemText primary="2D Map" onClick={handlemap} />
+        </ListItemButton>
       </List>
     </>
   );

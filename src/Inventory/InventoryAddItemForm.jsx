@@ -17,8 +17,10 @@ import { useState } from "react";
 import ReceieveOrderService from "../Purchase/receiveorder/ReceieveOrderService";
 import PlaceOrderService from "../Purchase/placeorder/PlaceOrderService";
 import { useFormik } from "formik";
-// import { productSchema } from "../formvalidation/ProductSchema";
-import axios from "axios";
+import { productSchema } from "../formvalidation/ProductSchema";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import InventoryService from "./InventoryService";
 
 const InventoryAddItemForm = () => {
   // Categories List ---------------------------------
@@ -34,6 +36,7 @@ const InventoryAddItemForm = () => {
       try {
         const res = await ReceieveOrderService.getList();
         setreceieveList(res.data);
+        console.log(res.data);
       } catch (error) {
         console.log(error);
       }
@@ -43,18 +46,20 @@ const InventoryAddItemForm = () => {
   }, []);
 
   receieveList.forEach((pl) => {
-    Receivedrows.unshift(pl.ro_id);
+    if (pl.productstatus === "NEW" && !pl.usestatus) {
+      Receivedrows.unshift(pl.roid);
+    }
   });
 
   // ReceievedIem List  ---------------------------------
   const [receieveItem, setReceiveItem] = useState([]);
   const [purchaseDetail, setpurchaseDetails] = useState({});
-
+  const [receieedId, setReceivedId] = useState("");
   useEffect(() => {
     const fetchdata = async () => {
       try {
-        const purchaseId = receieveList.find((pl) => pl.ro_id === receieveItem);
-
+        const purchaseId = receieveList.find((pl) => pl.roid === receieveItem);
+        setReceivedId(purchaseId.roid);
         if (purchaseId.purchaseid) {
           const purchaseDetails =
             await PlaceOrderService.getPurchaseDetailsById(
@@ -69,101 +74,114 @@ const InventoryAddItemForm = () => {
     };
     fetchdata();
   }, [receieveList, receieveItem]);
+
   Categoriesrows.push(purchaseDetail.categories);
 
   // ----------
   const initialValues = {
     productid: "",
-    receieveItem: "",
+    receieveItem: receieedId,
     productname: "",
-    brand: "",
+    brand: purchaseDetail.vendoruniquename,
     categories: "",
     about: "",
     title: "",
-    buyprice: 0,
-    sellingPrice: 0,
-    quantity: 0,
-    minimumQuantityAlert: 0,
+    buyprice: "",
+    sellingPrice: "",
+    quantity: purchaseDetail.quantity,
+    minimumQuantityAlert: "",
     autoReorderEnabled: "ACTIVE",
     length: "",
     breadth: "",
     height: "",
     volume: "",
-    image: [], // Initialize image field with null
+    vendoruniquename: purchaseDetail.vendoruniquename,
+    image: null,
   };
+
+  const [volume, setVolume] = useState("");
+
   const handleFileInputChange = (event) => {
     const fileList = event.target.files;
     const filesArray = Array.from(fileList);
     setFieldValue("image", filesArray);
   };
-  
-  const { values, handleChange, handleBlur, errors, touched, handleSubmit , setFieldValue } =
-    useFormik({
-      initialValues: initialValues,
-      // validationSchema : productSchema,
-      onSubmit: async (values) => {
-        // save to database
-        const formData = new FormData();
 
-        const productData = {
-          // receieveItem: receieveItem,
-          productname: values.productname,
-          brand: values.brand,
-          quantity: values.quantity,
-          sellingPrice: values.sellingPrice,
-          buyprice: values.buyprice,
-          title: values.title,
-          about: values.about,
-          categories: values.categories,
-          autoReorderEnabled: values.autoReorderEnabled,
-          minimumQuantityAlert: values.minimumQuantityAlert,
-          breadth: values.breadth,
-          length: values.length,
-          height: values.height,
-          volume: values.volume,
-        };
+  const nav = useNavigate();
 
-        const json = JSON.stringify(productData);
-        const blob = new Blob([json], {
-          type: "application/json",
-        });
+  const {
+    values,
+    handleChange,
+    handleBlur,
+    errors,
+    touched,
+    handleSubmit,
+    setFieldValue,
+  } = useFormik({
+    initialValues: initialValues,
+    validationSchema: productSchema,
+    onSubmit: async (values) => {
+      // save to database
+      const formData = new FormData();
+      const productData = {
+        receieveItem: receieedId,
+        productname: purchaseDetail.productname,
+        brand: purchaseDetail.vendoruniquename,
+        quantity: purchaseDetail.quantity,
+        sellingPrice: values.sellingPrice,
+        buyprice: purchaseDetail.buyprice,
+        title: values.title,
+        about: values.about,
+        categories: purchaseDetail.categories,
+        autoReorderEnabled: values.autoReorderEnabled,
+        minimumQuantityAlert: values.minimumQuantityAlert,
+        breadth: values.breadth,
+        length: values.length,
+        height: values.height,
+        volume: volume,
+        vendoruniquename: purchaseDetail.vendoruniquename,
+      };
 
-        // formData.append("product", JSON.stringify(productData));
-        formData.append("product", blob);
+      const json = JSON.stringify(productData);
+      const blob = new Blob([json], {
+        type: "application/json",
+      });
 
-        for (const image of values.image) {
-          formData.append("image", image);
-        }
+      formData.append("product", blob);
 
-        try {
-          console.log(formData);
-          console.log(productData);
-          console.log(values.image);
-          // Send the form data to the backend API using Axios
-          const response = await axios.post(
-            "http://localhost:8080/product",
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
+      for (const image of values.image) {
+        formData.append("image", image);
+      }
 
-          // Handle successful response from the backend
-          console.log("Product saved successfully:", response.data);
+      try {
+        console.log(formData);
+        console.log(productData);
+        console.log(values.image);
+        
+        const response = await InventoryService.addproduct(formData)
 
-          // Reset the form after successful submission
-        } catch (error) {
-          // Handle errors from the backend
-          console.error("Error saving product:", error);
-        }
-      },
-    });
+        console.log(
+          "🚀 ~ file: InventoryAddItemForm.jsx:162 ~ onSubmit: ~ response:",
+          response
+        );
+
+        toast.success("Product added to Inventory");
+        nav("/admin/inventory")
+      } catch (error) {
+        toast.error("Form is not valid please fill all the details");
+        console.error("Error saving product:", error);
+      }
+    },
+  });
+
+  useEffect(() => {
+    const newvolume = values.length * values.breadth * values.height;
+    setVolume(newvolume);
+  }, [values.length, values.breadth, values.height]);
 
   return (
     <>
-      <form>
+      <form style={{width:"100%"}}>
         <Stack direction="row" spacing={2}>
           <TextField
             sx={{ width: 350 }}
@@ -183,9 +201,6 @@ const InventoryAddItemForm = () => {
             options={Receivedrows}
             sx={{ width: 350 }}
             name="receieveItem"
-            // value={values.receieveItem}
-            // onChange={handleChange}
-            // onBlur={handleBlur}
             inputValue={receieveItem}
             color="secondary"
             onInputChange={(event, newina) => {
@@ -225,15 +240,17 @@ const InventoryAddItemForm = () => {
                 <TextField
                   id=""
                   label="Brand"
-                  sx={{ width: 350, color: "red" }}
                   variant="outlined"
+                  sx={{ width: 350, color: "red" }}
                   name="brand"
-                  value={values.brand}
+                  value={purchaseDetail.vendoruniquename}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  helperText={
-                    errors.brand && touched.brand ? "Brand Name Required" : null
-                  }
+                  disabled
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  
                 />
 
                 <TextField
@@ -256,7 +273,8 @@ const InventoryAddItemForm = () => {
             <Stack spacing={2} direction="row">
               <TextField
                 id="outlined-textarea"
-                label="Select Multiple Images"
+                label="Add Images"
+                placeholder=""
                 variant="outlined"
                 type="file"
                 sx={{ width: 350 }}
@@ -268,6 +286,10 @@ const InventoryAddItemForm = () => {
                 helperText={
                   errors.image && touched.image ? "Image Required" : null
                 }
+                required
+                InputLabelProps={{
+                  shrink: true,
+                }}
               />
 
               <TextField
@@ -379,7 +401,7 @@ const InventoryAddItemForm = () => {
                 }}
                 disabled
                 name="volume"
-                value={values.volume}
+                value={volume}
                 onChange={handleChange}
                 onBlur={handleBlur}
               />

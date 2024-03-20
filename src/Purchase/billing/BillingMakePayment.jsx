@@ -24,7 +24,7 @@ const BillingMakePayment = () => {
   const nav = useNavigate();
   function handleCancel(e) {
     e.stopPropagation();
-    nav("/purchase/billing");
+    nav("/admin/purchase/billing");
   }
 
   const [hide, setHide] = useState(0);
@@ -85,7 +85,7 @@ const BillingMakePayment = () => {
         console.log(error);
       });
 
-    nav("/purchase/billing");
+    nav("/admin/purchase/billing");
   }
 
   return (

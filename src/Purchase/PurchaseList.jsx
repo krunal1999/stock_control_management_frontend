@@ -16,11 +16,33 @@ const columns = [
   { field: "quantity", headerName: "Quantity", width: 130 },
 
   { field: "total", headerName: "Total", width: 200 },
-  { field: "orderstatus", headerName: "OrderStatus", width: 130 },
-  { field: "billstatus", headerName: "Bill Status", width: 130 },
+  {
+    field: "orderstatus",
+    headerName: "OrderStatus",
+    width: 130,
+    renderCell: (param) => {
+      return (
+        <div className={`cellWithstatus ${param.row.orderstatus}`}>
+          {param.row.orderstatus}
+        </div>
+      );
+    },
+  },
+  {
+    field: "billstatus",
+    headerName: "Bill Status",
+    width: 130,
+    renderCell: (param) => {
+      return (
+        <div className={`cellWithstatus ${param.row.billstatus}`}>
+          {param.row.billstatus}
+        </div>
+      );
+    },
+  },
 ];
 
-const PurchaseList = ({ filter }) => {
+const PurchaseList = ({ filter, onUnpaidBills }) => {
   const rows = [];
   const [purchaselist, setpurchaseList] = useState([]);
 
@@ -29,30 +51,46 @@ const PurchaseList = ({ filter }) => {
       try {
         const res = await PlaceOrderService.getAllPurchaseList();
         setpurchaseList(res.data);
+        
         console.log(res.data);
       } catch (error) {
         console.log(error);
       }
     };
-    
-    fetchdata();
-  },[]);
 
+    fetchdata();
+  }, []);
+
+  let unpaidBills;
+  let totalUnpaidAmount=0;
+
+  
   purchaselist.forEach((pl) => {
     if (filter === "ORDERED") {
       if (pl.orderstatus === "ORDERED") {
         rows.unshift(pl);
+      }else{
+
       }
-    }else if (filter === "UNPAID") {
+    } else if (filter === "UNPAID") {
       if (pl.billstatus === "UNPAID") {
         rows.unshift(pl);
+        
+        totalUnpaidAmount += parseFloat(pl.total)
       }
-    }
-    else{
+    } else if (pl.orderstatus === "") {
+      
+    }else{
       rows.unshift(pl);
     }
   });
 
+  
+  if (filter === "UNPAID") {
+   
+    unpaidBills = rows.length
+    onUnpaidBills(unpaidBills,totalUnpaidAmount)
+  }
 
   
 

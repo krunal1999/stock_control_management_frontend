@@ -25,7 +25,7 @@ const ReceieveOrder = () => {
 
   function handleClick(e) {
     e.stopPropagation();
-    nav("/purchase/addreceieveorder");
+    nav("/admin/purchase/addreceieveorder");
   }
 
   function CustomTabPanel(props) {
@@ -87,6 +87,7 @@ const ReceieveOrder = () => {
   }, []);
 
   receieveList.forEach((pl) => {
+   
     rows.unshift(pl);
     totalReceivedOrders++;
     const quantityAsNumber = parseInt(pl.quantity, 10);

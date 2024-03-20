@@ -9,7 +9,7 @@ const Purchase = () => {
 
   function handleClick(e) {
     e.stopPropagation();
-    nav("/purchase/purchaseorder");
+    nav("/admin/purchase/purchaseorder");
   }
 
   return (

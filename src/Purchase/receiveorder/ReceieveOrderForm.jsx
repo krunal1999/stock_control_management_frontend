@@ -12,19 +12,23 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import { useEffect, useState } from "react";
 import PlaceOrderService from "../placeorder/PlaceOrderService";
 import AdminLayout from "../../layouts/AdminLayout";
+import InventoryService from "../../Inventory/InventoryService";
+import { toast } from "react-toastify";
+import ReceieveOrderService from "./ReceieveOrderService";
 
 const ReceieveOrderForm = () => {
   const nav = useNavigate();
 
   function handleCancel(e) {
     e.stopPropagation();
-    nav("/purchase/receiveorder");
+    nav("/admin/purchase/receiveorder");
   }
 
   const [hide, setHide] = useState(0);
   const [purchaseid, setPurchaseid] = useState("");
   const [values, setValues] = useState("");
   const [purchaseitemlist, setPurchaseItemList] = useState([]);
+  const [productstatus, setproductstatus] = useState("");
 
   let itemlist = [];
 
@@ -42,7 +46,7 @@ const ReceieveOrderForm = () => {
   }, []);
 
   purchaseitemlist.forEach((l) => {
-    if (l.orderstatus !== "RECEIVED") {
+    if (l.orderstatus !== "RECEIVED" && l.orderstatus === "ORDERED") {
       itemlist.push(l.purchaseid);
     }
   });
@@ -56,6 +60,7 @@ const ReceieveOrderForm = () => {
         const res = await PlaceOrderService.getPurchaseDetailsById(purchaseid);
         console.log(res.data);
         setValues(res.data);
+        setproductstatus(res.data.productStatus);
         setHide(1);
       } catch (error) {
         console.log(error);
@@ -73,7 +78,36 @@ const ReceieveOrderForm = () => {
         console.log(error);
       });
 
-    nav("/purchase/receiveorder");
+    nav("/admin/purchase/receiveorder");
+  }
+
+  function handleAddQuantity(e) {
+    e.stopPropagation();
+
+    PlaceOrderService.updateOrderStatus(purchaseid, "RECEIVED")
+      .then((res) => {})
+      .catch((error) => {
+        console.log(error);
+      });
+
+      ReceieveOrderService.updateUsedStatus(values.roid).then((res) => {})
+      .catch((error) => {
+        console.log(error);
+      });
+
+
+      InventoryService.updateReorderQuantity(values.reorderproductid,values.quantity).then((res) => {
+       
+
+        nav("/admin/purchase/receiveorder");
+        toast.success("quantity added")
+        
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    
   }
 
   return (
@@ -100,7 +134,7 @@ const ReceieveOrderForm = () => {
         <br />
         <Divider />
 
-        {/* add new item form  */}
+        
         <Paper elevation={10} sx={{ padding: 3, marginTop: 3 }}>
           <Autocomplete
             disablePortal
@@ -162,13 +196,23 @@ const ReceieveOrderForm = () => {
               <br />
 
               <Stack width={300}>
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={handleMark}
-                >
-                  Mark as Received
-                </Button>
+                {productstatus === "NEW" ? (
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={handleMark}
+                  >
+                    Mark as Received
+                  </Button>
+                ) : (
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={handleAddQuantity}
+                  >
+                    Add quantity in Existing product {values.productname}
+                  </Button>
+                )}
               </Stack>
             </div>
           ) : (

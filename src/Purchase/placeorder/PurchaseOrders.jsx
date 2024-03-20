@@ -10,7 +10,7 @@ const PurchaseOrders = () => {
   const nav = useNavigate();
   function handleClick(e) {
     e.stopPropagation();
-    nav("/purchase");
+    nav("/admin/purchase");
   }
 
   return (
@@ -38,7 +38,7 @@ const PurchaseOrders = () => {
         <Divider />
 
         {/* add new item form  */}
-        <Paper elevation={10} sx={{ padding: 3, marginTop: 3 }}>
+        <Paper elevation={10} sx={{ padding: 3, marginTop: 3 , width:"100%" }}>
           <PurchasePlaceOrderForm />
         </Paper>
       </AdminLayout>

@@ -11,18 +11,21 @@ import { useEffect, useState } from "react";
 import VendorService from "./PurchaseService/VendorService";
 
 const Vendor = () => {
+  const [updateDone, setUpdateDone] = useState(false);
+  const [deleteDone, setDeleteDone] = useState(false);
+
   const nav = useNavigate();
 
   function handleClick(e) {
     e.stopPropagation();
-    nav("/purchase/addvendor");
+    nav("/admin/purchase/addvendor");
   }
 
   const rows = [];
-
   const [vendor, setVendor] = useState([]);
-  let totalVendors=0;
+  let totalVendors = 0;
   let activeVendors = 0;
+  let inactiveVendors = 0;
 
   useEffect(() => {
     const fetchdata = async () => {
@@ -30,22 +33,71 @@ const Vendor = () => {
         const res = await VendorService.getVendor();
         setVendor(res.data);
         console.log(res.data);
-        
       } catch (error) {
         console.log(error);
       }
     };
-    
+
     fetchdata();
-  }, []);
+  }, [updateDone, deleteDone]);
 
   vendor.forEach((v) => {
     rows.unshift(v);
     totalVendors++;
-    if (v.activestatus) {
+    if (v.activestatus === "ACTIVE") {
       activeVendors++;
+    } else {
+      inactiveVendors++;
     }
   });
+
+  // change the status-------------
+  const [changeStatusId, setChangestatusId] = useState(null);
+
+  const changeStatus = (id) => {
+    setChangestatusId(id);
+    setUpdateDone(true);
+  };
+
+  useEffect(() => {
+    if (updateDone) {
+      VendorService.updateVendorStatus(changeStatusId)
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+    setUpdateDone(false);
+  }, [changeStatusId, updateDone]);
+
+  // change the status-------------
+
+  // delete vendor -------------
+
+  const [deleteVendorID, setDeleteVendorID] = useState(null);
+
+  const deleteVendor = (id) => {
+    setDeleteVendorID(id);
+    setDeleteDone(true);
+  };
+
+  useEffect(() => {
+    if (deleteDone) {
+      VendorService.deleteVendor(deleteVendorID)
+        .then((response) => {
+          console.log(response);
+          setUpdateDone(false);
+          setUpdateDone(true);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [deleteVendorID, deleteDone]);
+
+  // delete vendor -------------
 
   return (
     <>
@@ -67,26 +119,26 @@ const Vendor = () => {
             maxvalue={totalVendors}
             cardcolor="#ace1af"
             icon={
-              <PersonOffIcon sx={{ width: 40, height: 40, color: "#007b5e" }} />
+              <RecordVoiceOverIcon
+                sx={{ width: 40, height: 40, color: "#007b5e" }}
+              />
             }
             pathcolour="#007b5e"
           />
           <StatusCards
             title="Inactive Vendor"
-            value={totalVendors-activeVendors}
+            value={inactiveVendors}
             maxvalue={totalVendors}
             cardcolor="#de6fa1"
             icon={
-              <RecordVoiceOverIcon
-                sx={{ width: 40, height: 40, color: "#cc2400" }}
-              />
+              <PersonOffIcon sx={{ width: 40, height: 40, color: "#cc2400" }} />
             }
             pathcolour="#cc2400"
           />
         </Stack>
         <br />
         <Grid container spacing={2}>
-          {/* div with add new button */}
+          
           <Grid item xs={12}>
             <Paper varient="outlined" elevation={0}>
               <div className="addnewitem">
@@ -101,11 +153,15 @@ const Vendor = () => {
             </Paper>
           </Grid>
 
-          {/* div with list */}
+         
 
           <Grid item xs={12}>
             <Paper varient="outlined" elevation={2}>
-              <VendorList rows={rows} />
+              <VendorList
+                rows={rows}
+                onChangeStatus={changeStatus}
+                ondelete={deleteVendor}
+              />
             </Paper>
           </Grid>
         </Grid>

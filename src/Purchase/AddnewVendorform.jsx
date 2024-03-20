@@ -1,10 +1,12 @@
 import {
   Button,
+  Divider,
   FormControl,
   FormHelperText,
   InputLabel,
   OutlinedInput,
   Stack,
+  Typography,
 } from "@mui/material";
 import React from "react";
 import VendorService from "./PurchaseService/VendorService";
@@ -24,6 +26,8 @@ const AddnewVendorform = () => {
     email: "",
     location: "",
     country: "",
+    brandname: "",
+    titles: "",
   };
 
   const {
@@ -34,28 +38,28 @@ const AddnewVendorform = () => {
     handleChange,
     handleSubmit,
     handleReset,
-  
   } = useFormik({
     initialValues: initialValues,
     validationSchema: vendorSchema,
     onSubmit: (values, action) => {
+      
       VendorService.saveVendor(values)
         .then((response) => {
           toast.success("Vendor Added Successfully");
 
           setTimeout(() => {
-            nav("/purchase/vendor");
-          }, 2000);
+            nav("/admin/purchase/vendor");
+          }, 1000);
         })
         .catch((error) => {
-          toast.error("Failed to add Vendor");
-          console.log(error);
+          if(error.response.status === 409) {
+           
+            toast.error("Vendor Display Name Already Exist, Please Enter other name");
+            
+          }
         });
       action.resetForm();
-      console.log(
-        "🚀 ~ file: AddnewVendorform.jsx:42 ~ AddnewVendorform ~ values:",
-        values
-      );
+      
     },
   });
 
@@ -63,6 +67,70 @@ const AddnewVendorform = () => {
     <>
       <div className="box4">
         <Stack spacing={4} direction="row">
+        <FormControl>
+            <InputLabel htmlFor="component-error">Brand Name</InputLabel>
+            <OutlinedInput
+              id=""
+              label="Brand Name"
+              variant="outlined"
+              name="brandname"
+              required
+              value={values.brandname}
+              onChange={handleChange}
+              onBlur={handleBlur}
+            />
+            {errors.brandname && touched.brandname ? (
+              <FormHelperText id="component-error-text" error>
+                please enter brand Number
+              </FormHelperText>
+            ) : null}
+          </FormControl>
+          <FormControl>
+            <InputLabel htmlFor="component-error">Display Name</InputLabel>
+            <OutlinedInput
+              id=""
+              label="Display Name"
+              variant="outlined"
+              name="vendoruniquename"
+              
+              value={values.vendoruniquename}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              
+            />
+            {errors.vendoruniquename && touched.vendoruniquename ? (
+              <FormHelperText id="component-error-text" error>
+                please enter Display Name
+              </FormHelperText>
+            ) : null}
+          </FormControl>
+        </Stack>
+        <br />
+        <Divider />
+        <Typography variant="h5">
+          Contact Person Details
+        </Typography>
+        <br />
+        <Stack spacing={4} direction="row">
+          <FormControl>
+            <InputLabel htmlFor="component-error">Title</InputLabel>
+            <OutlinedInput
+              id="component-error"
+              label="Title"
+              variant="component-outlined"
+              name="titles"
+              value={values.titles}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              required
+            />
+            {errors.titles && touched.titles ? (
+              <FormHelperText id="component-error-text" error>
+                please enter title
+              </FormHelperText>
+            ) : null}
+          </FormControl>
+
           <FormControl>
             <InputLabel htmlFor="component-error">First Name</InputLabel>
             <OutlinedInput
@@ -100,25 +168,6 @@ const AddnewVendorform = () => {
               </FormHelperText>
             ) : null}
           </FormControl>
-
-          <FormControl>
-            <InputLabel htmlFor="component-error">Display Name</InputLabel>
-            <OutlinedInput
-              id=""
-              label="Display Name"
-              variant="outlined"
-              name="vendoruniquename"
-              required
-              value={values.vendoruniquename}
-              onChange={handleChange}
-              onBlur={handleBlur}
-            />
-            {errors.vendoruniquename && touched.vendoruniquename ? (
-              <FormHelperText id="component-error-text" error>
-                please enter Display name
-              </FormHelperText>
-            ) : null}
-          </FormControl>
         </Stack>
 
         <br></br>
@@ -142,6 +191,8 @@ const AddnewVendorform = () => {
               </FormHelperText>
             ) : null}
           </FormControl>
+
+          
 
           <FormControl>
             <InputLabel htmlFor="component-error">Email</InputLabel>

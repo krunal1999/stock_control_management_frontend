@@ -15,20 +15,20 @@ const PurchaseSidebar = () => {
   const nav = useNavigate();
 
   const handlePurchase = () => {
-    nav("/purchase");
+    nav("/admin/purchase");
   };
 
   const handleVendor = () => {
-    nav("/purchase/vendor");
+    nav("/admin/purchase/vendor");
   };
   const handlepurchaseOrder = () => {
-    nav("/purchase/purchaseorder");
+    nav("/admin/purchase/purchaseorder");
   };
   const handleReceiveOrder = () => {
-    nav("/purchase/receiveorder");
+    nav("/admin/purchase/receiveorder");
   };
   const handleBilling = () => {
-    nav("/purchase/billing");
+    nav("/admin/purchase/billing");
   };
 
   return (

@@ -1,15 +1,12 @@
-import { useEffect } from "react";
 import AdminLayout from "../layouts/AdminLayout";
-import { toast } from "react-toastify";
+import HomeDashboard from "../home/HomeDashboard";
 
 const Home = () => {
-  useEffect(()=>{
-    toast.info("home");
-  },[])
+ 
   return (
     <>
      <AdminLayout>
-      <div>homee</div>
+      <HomeDashboard />
      
      </AdminLayout>
     </>

@@ -28,3 +28,16 @@
         
 
 }
+.cellWithstatus.ACTIVE {
+        padding: 5px;
+        border-radius: 5px;
+        background-color: rgba(46, 204, 112, 0.748); 
+        color: #2c3e50; 
+      }
+      
+      .cellWithstatus.INACTIVE {
+        padding: 5px;
+        border-radius: 5px;
+        background-color: rgba(231, 76, 60, 0.9); 
+        color: #833939; 
+      }

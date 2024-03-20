@@ -9,7 +9,7 @@ const InventoryAddItems = () => {
 
   function handleClick(e) {
     e.stopPropagation();
-    nav("/inventory");
+    nav("/admin/inventory");
   }
   return (
     <>

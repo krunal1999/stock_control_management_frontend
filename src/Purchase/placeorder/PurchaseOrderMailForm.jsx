@@ -12,7 +12,9 @@ const PurchaseOrderMailForm = () => {
   const [vendor, setVendor] = useState("");
 
   const nav = useNavigate();
-
+  const handleCancel = () => {
+    nav("/admin/purchase");
+  };
   const editor = useRef(null);
   const [content, setContent] = useState(
     `<html>
@@ -120,18 +122,17 @@ const PurchaseOrderMailForm = () => {
         console.log(error);
       });
 
-      nav("/purchase")
+    nav("/admin/purchase");
 
-      PlaceOrderService.updateOrderStatus(emailData.purchaseid,"ORDERED").then((res)=>{
-       
-      }).catch((error)=>{
-        console.log(error)
-      })
-
+    PlaceOrderService.updateOrderStatus(emailData.purchaseid, "ORDERED")
+      .then((res) => {})
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   return (
-    <form>
+    <form style={{ width: "100%" }}>
       <div className="mailbox">
         <label htmlFor="" className="mailboxlabel">
           From&nbsp;&nbsp;&nbsp;&nbsp;
@@ -185,7 +186,7 @@ const PurchaseOrderMailForm = () => {
         <Button variant="contained" color="success" onClick={sendEmailData}>
           Send
         </Button>
-        <Button variant="contained" color="error">
+        <Button variant="contained" color="error" onClick={handleCancel}>
           Cancel
         </Button>
       </Stack>

@@ -1,41 +1,94 @@
-.purchaseitembox{
-        display: flex;
-        gap: 20px;
-        width: 40%;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
+.purchaseitembox {
+  display: flex;
+  gap: 20px;
+  width: 40%;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
-.purchaseitemformtext{
-        font-size: 20px;
-        font-weight: 400;
-
-
+.purchaseitemformtext {
+  font-size: 20px;
+  font-weight: 400;
 }
 
-.boxfortable{
-        width: 90%;
-        margin-bottom: 24px;
-        
-
+.boxfortable {
+  width: 90%;
+  margin-bottom: 24px;
 }
 
-.mailbox{
-        display: flex;
-        gap: 20px;
-        width: 40%;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        font-size: 20px;
-        font-weight: 400;
-        padding-left: 40px;
-        
+.mailbox {
+  display: flex;
+  gap: 20px;
+  width: 40%;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 400;
+  padding-left: 40px;
 }
-.mailboxeditor{
-        width: 60%;
-        padding-left: 40px;
-        height: 600px;
-        overflow-x: scroll;
-        margin-bottom: 24px;
+.mailboxeditor {
+  width: 60%;
+  padding-left: 40px;
+  height: 600px;
+  overflow-x: scroll;
+  margin-bottom: 24px;
+}
+.cellWithstatus.ORDERED {
+  padding: 5px;
+  border-radius: 5px;
+  background-color: rgba(201, 204, 46, 0.561);
+  color: #c89003;
+}
+.cellWithstatus.RECEIVED {
+  padding: 5px;
+  border-radius: 5px;
+  background-color: rgba(46, 204, 112, 0.748);
+  color: #2c3e50;
+}
+.cellWithstatus.PAID {
+  padding: 5px;
+  border-radius: 5px;
+  background-color: rgba(46, 204, 112, 0.748);
+  color: #2c3e50;
+}
+
+.cellWithstatus.UNPAID {
+  padding: 5px;
+  border-radius: 5px;
+  background-color: rgba(231, 77, 60, 0.634);
+  color: #680606;
+}
+
+.cellWithstatus.INACTIVE {
+  padding: 5px;
+  border-radius: 5px;
+  background-color: rgba(231, 76, 60, 0.9);
+  color: #833939;
+}
+.cellWithstatus.INACTIVE {
+  padding: 5px;
+  border-radius: 5px;
+  background-color: rgba(231, 76, 60, 0.9);
+  color: #833939;
+}
+
+.cellWithstatus.Cash {
+  padding: 5px;
+  border-radius: 5px;
+  background-color: rgba(60, 231, 80, 0.449);
+  color: #389406;
+}
+
+.cellWithstatus.Card {
+  padding: 5px;
+  border-radius: 5px;
+  background-color: rgba(231, 171, 60, 0.571);
+  color: #9a7519;
+}
+.cellWithstatus.BankTransfer {
+  padding: 5px;
+  border-radius: 5px;
+  background-color: rgba(60, 194, 231, 0.9);
+  color: #397183;
 }

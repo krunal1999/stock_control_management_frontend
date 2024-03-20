@@ -13,12 +13,13 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import InventorySidebar from "../Inventory/InventorySidebar";
 import PurchaseSidebar from "../Purchase/PurchaseSidebar";
-
 import { ListItemButton, ListItemIcon } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import DashboardCustomizeTwoToneIcon from "@mui/icons-material/DashboardCustomizeTwoTone";
 import StoreTwoToneIcon from "@mui/icons-material/StoreTwoTone";
 import MonetizationOnTwoToneIcon from "@mui/icons-material/MonetizationOnTwoTone";
+import HomeSidebar from "../home/HomeSidebar";
+import SalesSidebar from "../sales/SalesSidebar";
 
 const drawerWidth = 240;
 
@@ -90,7 +91,7 @@ export default function Sidebar() {
 
         <Divider />
 
-        <div>
+        <div style={{ position: "relative" }}>
           <Accordion onClick={() => setOpen(true)}>
             <AccordionSummary
               expandIcon={open ? <ExpandMoreIcon /> : ""}
@@ -101,7 +102,13 @@ export default function Sidebar() {
                 {open ? "Home" : <DashboardCustomizeTwoToneIcon />}
               </Typography>
             </AccordionSummary>
-            {open ? <AccordionDetails></AccordionDetails> : ""}
+            {open ? (
+              <AccordionDetails>
+                <HomeSidebar />
+              </AccordionDetails>
+            ) : (
+              ""
+            )}
           </Accordion>
 
           <Accordion onClick={() => setOpen(true)}>
@@ -153,14 +160,13 @@ export default function Sidebar() {
             </AccordionSummary>
             {open ? (
               <AccordionDetails>
-                <Typography></Typography>
+                <SalesSidebar></SalesSidebar>
               </AccordionDetails>
             ) : (
               ""
             )}
           </Accordion>
         </div>
-
         <Divider />
       </Drawer>
     </Box>
